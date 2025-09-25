@@ -190,27 +190,98 @@
             overflow: hidden;
         }
         
-        /* --- New Grid Background --- */
-        .hero::before {
-            content: "";
+        /* --- New Grid Background with Images --- */
+        .hero-grid {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image:
-                linear-gradient(rgba(0, 87, 166, 0.07) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 87, 166, 0.07) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: pan-grid 45s linear infinite;
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            grid-template-rows: repeat(20, 1fr);
+            gap: 1px;
             z-index: 1;
             mask-image: radial-gradient(ellipse at center, transparent 20%, black 70%);
             -webkit-mask-image: radial-gradient(ellipse at center, transparent 20%, black 70%);
         }
 
+        .grid-cell {
+            background-color: rgba(0, 87, 166, 0.07);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .grid-cell.with-image {
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grid-cell img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.1;
+            filter: grayscale(100%) sepia(30%) hue-rotate(200deg) brightness(0.8);
+            transition: opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease;
+            border-radius: 2px;
+        }
+
+        .grid-cell:hover img {
+            opacity: 0.4;
+            transform: scale(1.08);
+            filter: grayscale(80%) sepia(40%) hue-rotate(200deg) brightness(0.9);
+        }
+
+        .grid-cell.with-image {
+            position: relative;
+        }
+
+        .grid-cell.with-image::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(0, 87, 166, 0.1), rgba(0, 87, 166, 0.05));
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .grid-cell.with-image img {
+            position: relative;
+            z-index: 2;
+        }
+
+        .grid-cell.with-image {
+            animation: subtle-pulse 6s ease-in-out infinite;
+        }
+
+        @keyframes subtle-pulse {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% { 
+                transform: scale(1.02);
+                opacity: 0.95;
+            }
+        }
+
+        .grid-cell.with-image:nth-child(odd) {
+            animation-delay: 0s;
+        }
+
+        .grid-cell.with-image:nth-child(even) {
+            animation-delay: 3s;
+        }
+
         @keyframes pan-grid {
-            from { background-position: 0 0; }
-            to { background-position: 50px 50px; }
+            from { transform: translate(0, 0); }
+            to { transform: translate(50px, 50px); }
         }
         
         .hero-container {
@@ -503,6 +574,31 @@
 
         .section-benefits {
             background-color: var(--off-white);
+            position: relative;
+        }
+
+        .section-benefits::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(135deg, transparent 49%, var(--off-white) 50%, var(--off-white) 100%);
+            transform: translateY(-99px);
+            z-index: 1;
+        }
+
+        .section-benefits::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(45deg, var(--off-white) 0%, var(--off-white) 50%, transparent 51%);
+            transform: translateY(99px);
+            z-index: 1;
         }
         
         .section-science {
@@ -510,6 +606,19 @@
             min-height: 100vh;
             display: flex;
             align-items: center;
+            position: relative;
+        }
+
+        .section-science::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(135deg, transparent 49%, var(--header-blue) 50%, var(--header-blue) 100%);
+            transform: translateY(-99px);
+            z-index: 1;
         }
 
         .section-science h2, .section-science .section-subtitle {
@@ -542,12 +651,58 @@
 
         .silhouette-part {
             fill: rgba(0, 87, 166, 0.1);
-            transition: fill 0.5s ease, filter 0.5s ease;
+            transition: fill 0.5s ease, filter 0.5s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
         }
         
         .silhouette-part.is-active {
             fill: rgba(0, 87, 166, 0.4);
             filter: drop-shadow(0 0 20px var(--body-blue));
+            transform: scale(1.025);
+            animation: glowPulse 1s ease-in-out infinite;
+        }
+
+        /* Pulsing glow ring animation */
+        @keyframes glowPulse {
+            0%, 100% {
+                filter: drop-shadow(0 0 20px var(--body-blue)) drop-shadow(0 0 30px rgba(0, 87, 166, 0.3));
+            }
+            50% {
+                filter: drop-shadow(0 0 35px var(--body-blue)) drop-shadow(0 0 50px rgba(0, 87, 166, 0.6));
+            }
+        }
+
+        /* Glow ring effect for silhouette parts */
+        .silhouette-part::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            transform: translate(-50%, -50%);
+            border-radius: 90%;
+            background: radial-gradient(circle, rgba(0, 87, 166, 0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .silhouette-part.is-active::before {
+            opacity: 1;
+            animation: ringPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes ringPulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.6;
+            }
         }
 
         .benefits-scrolling-content {
@@ -735,6 +890,66 @@
             fill: var(--light-accent-blue);
             stroke: var(--header-blue);
             stroke-width: 2;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .nad-chart .dot-hover {
+            fill: none;
+            stroke: var(--light-accent-blue);
+            stroke-width: 2;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .nad-chart .data-point:hover .dot {
+            r: 6;
+            fill: var(--white);
+        }
+        .nad-chart .data-point:hover .dot-hover {
+            opacity: 0.3;
+        }
+        
+        /* Chart Tooltip */
+        .chart-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: var(--white);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate(-50%, -100%);
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .chart-tooltip.show {
+            opacity: 1;
+        }
+        .chart-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.9);
+        }
+        .tooltip-age {
+            font-weight: 600;
+            color: var(--light-accent-blue);
+            margin-bottom: 4px;
+        }
+        .tooltip-value {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .tooltip-description {
+            font-size: 12px;
+            opacity: 0.8;
+            line-height: 1.3;
         }
 
         /* Flowchart */
@@ -763,6 +978,148 @@
             color: var(--light-accent-blue);
             font-size: 1.25rem;
             line-height: 1;
+        }
+        
+        /* Animated Flowchart Arrows */
+        .flow-arrow-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 30px;
+            margin: 0.5rem 0;
+        }
+        .flow-arrow-svg {
+            width: 20px;
+            height: 30px;
+        }
+        .arrow-path {
+            stroke-dasharray: 50;
+            stroke-dashoffset: 50;
+            transition: stroke-dashoffset 1.5s ease-in-out;
+        }
+        .arrow-path.animate {
+            stroke-dashoffset: 0;
+        }
+
+        /* --- Testimonials Section --- */
+        .section-testimonials {
+            background-color: var(--off-white);
+            position: relative;
+        }
+
+        .testimonials-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .testimonial-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .testimonial-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--light-accent-blue));
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+        }
+
+        .testimonial-content {
+            margin-bottom: 1.5rem;
+        }
+
+        .testimonial-quote {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-dark);
+            font-style: italic;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .testimonial-quote::before {
+            content: '"';
+            font-size: 3rem;
+            color: var(--accent-blue);
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            font-family: serif;
+            opacity: 0.3;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .testimonial-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--light-accent-blue);
+        }
+
+        .testimonial-info h4 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .testimonial-info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .testimonials-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 3rem;
+            padding: 2rem 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 0.5rem;
         }
 
         /* --- Custom Cursor --- */
@@ -953,6 +1310,26 @@
             .benefit-card p {
                 margin: 0 auto;
             }
+            
+            /* Mobile Testimonials */
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .testimonial-card {
+                padding: 1.5rem;
+            }
+            
+            .testimonials-stats {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
@@ -986,6 +1363,449 @@
 
     <!-- Hero Section -->
     <section class="hero" id="home">
+        <!-- Grid Background with Human Images -->
+        <div class="hero-grid">
+            <!-- Row 1 -->
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Person 1"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Person 11"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Person 1"></div>
+            
+            <!-- Row 2 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Person 3"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell "></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Person 8"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 3 -->
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Person 4"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face" alt="Person 5"></div>
+            
+            <!-- Row 4 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face" alt="Person 5"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face" alt="Person 6"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell "></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 5 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 6 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 7 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 8 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 9 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 10 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 11 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 12 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 13 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 14 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 15 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 16 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Person 3"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=face" alt="Person 9"></div>
+            
+            <!-- Row 17 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"> <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face" alt="Person 7"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Person 1"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 18 -->
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Person 4"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Person 8"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 19 -->
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Person 11"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            
+            <!-- Row 20 -->
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face" alt="Person 5"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face" alt="Person 5"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face" alt="Person 6"></div>
+        </div>
+        
         <div class="container hero-container">
             <div class="hero-content">
                 <h1>Unlock Your Cellular <span class="gradient-text">Potential.</span></h1>
@@ -1114,6 +1934,10 @@
                                     <stop offset="0%" style="stop-color:var(--light-accent-blue); stop-opacity:0.4"/>
                                     <stop offset="100%" style="stop-color:var(--light-accent-blue); stop-opacity:0"/>
                                 </linearGradient>
+                                <!-- Tooltip background -->
+                                <filter id="tooltip-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="rgba(0,0,0,0.3)"/>
+                                </filter>
                             </defs>
                             <!-- Grid -->
                             <line class="grid-line" x1="20" y1="10" x2="280" y2="10"></line>
@@ -1129,17 +1953,37 @@
                             <path class="area" d="M 30 10 L 110 32.5 L 190 70 L 270 92.5 V 130 H 30 Z"></path>
                             <!-- Data Path (Line) -->
                             <path class="line" d="M 30 10 L 110 32.5 L 190 70 L 270 92.5"></path>
-                            <!-- Data Points -->
-                            <circle class="dot" cx="30" cy="10" r="4"></circle>
-                            <circle class="dot" cx="110" cy="32.5" r="4"></circle>
-                            <circle class="dot" cx="190" cy="70" r="4"></circle>
-                            <circle class="dot" cx="270" cy="92.5" r="4"></circle>
+                            <!-- Data Points with tooltips -->
+                            <g class="data-point" data-age="20s" data-value="100%" data-description="Peak NAD+ levels">
+                                <circle class="dot" cx="30" cy="10" r="4"></circle>
+                                <circle class="dot-hover" cx="30" cy="10" r="8" opacity="0"></circle>
+                            </g>
+                            <g class="data-point" data-age="30s-40s" data-value="85%" data-description="First decline begins">
+                                <circle class="dot" cx="110" cy="32.5" r="4"></circle>
+                                <circle class="dot-hover" cx="110" cy="32.5" r="8" opacity="0"></circle>
+                            </g>
+                            <g class="data-point" data-age="50s-60s" data-value="50%" data-description="Significant reduction">
+                                <circle class="dot" cx="190" cy="70" r="4"></circle>
+                                <circle class="dot-hover" cx="190" cy="70" r="8" opacity="0"></circle>
+                            </g>
+                            <g class="data-point" data-age="70s+" data-value="25%" data-description="Critical low levels">
+                                <circle class="dot" cx="270" cy="92.5" r="4"></circle>
+                                <circle class="dot-hover" cx="270" cy="92.5" r="8" opacity="0"></circle>
+                            </g>
                             <!-- X-Axis Labels -->
                             <text class="axis-label" x="30" y="145" text-anchor="middle">20s</text>
                             <text class="axis-label" x="110" y="145" text-anchor="middle">30s-40s</text>
                             <text class="axis-label" x="190" y="145" text-anchor="middle">50s-60s</text>
                             <text class="axis-label" x="270" y="145" text-anchor="middle">70s+</text>
                         </svg>
+                        <!-- Tooltip -->
+                        <div class="chart-tooltip" id="chart-tooltip">
+                            <div class="tooltip-content">
+                                <div class="tooltip-age"></div>
+                                <div class="tooltip-value"></div>
+                                <div class="tooltip-description"></div>
+                            </div>
+                        </div>
                     </div>
                      <p class="source-text">Source: Massudi et al., PLoS ONE, 2012.</p>
                 </div>
@@ -1149,11 +1993,23 @@
                     <div class="flowchart-container">
                         <div class="flowchart">
                             <div class="flow-item">Resveratrol</div>
-                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-arrow-container">
+                                <svg class="flow-arrow-svg" viewBox="0 0 20 40">
+                                    <path class="arrow-path" d="M 10 5 L 10 30 M 5 25 L 10 30 L 15 25" stroke="var(--light-accent-blue)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
                             <div class="flow-item">Activates "Longevity" Genes*</div>
-                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-arrow-container">
+                                <svg class="flow-arrow-svg" viewBox="0 0 20 40">
+                                    <path class="arrow-path" d="M 10 5 L 10 30 M 5 25 L 10 30 L 15 25" stroke="var(--light-accent-blue)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
                             <div class="flow-item">Boosts NAD+'s Function*</div>
-                            <div class="flow-arrow">&darr;</div>
+                            <div class="flow-arrow-container">
+                                <svg class="flow-arrow-svg" viewBox="0 0 20 40">
+                                    <path class="arrow-path" d="M 10 5 L 10 30 M 5 25 L 10 30 L 15 25" stroke="var(--light-accent-blue)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
                             <div class="flow-item dark">Enhanced Cellular Health</div>
                         </div>
                     </div>
@@ -1278,6 +2134,72 @@
         const elementsToAnimate = document.querySelectorAll('.fade-in-up');
         elementsToAnimate.forEach(el => observer.observe(el));
 
+        // --- Chart Tooltips ---
+        const chartTooltip = document.getElementById('chart-tooltip');
+        const dataPoints = document.querySelectorAll('.data-point');
+        
+        if (chartTooltip && dataPoints.length > 0) {
+            dataPoints.forEach(point => {
+                const dot = point.querySelector('.dot');
+                const dotHover = point.querySelector('.dot-hover');
+                
+                point.addEventListener('mouseenter', (e) => {
+                    const age = point.dataset.age;
+                    const value = point.dataset.value;
+                    const description = point.dataset.description;
+                    
+                    // Update tooltip content
+                    chartTooltip.querySelector('.tooltip-age').textContent = age;
+                    chartTooltip.querySelector('.tooltip-value').textContent = value;
+                    chartTooltip.querySelector('.tooltip-description').textContent = description;
+                    
+                    // Position tooltip
+                    const rect = point.getBoundingClientRect();
+                    const chartContainer = point.closest('.chart-container');
+                    const containerRect = chartContainer.getBoundingClientRect();
+                    
+                    const x = rect.left + rect.width / 2 - containerRect.left;
+                    const y = rect.top - containerRect.top;
+                    
+                    chartTooltip.style.left = x + 'px';
+                    chartTooltip.style.top = y + 'px';
+                    chartTooltip.classList.add('show');
+                });
+                
+                point.addEventListener('mouseleave', () => {
+                    chartTooltip.classList.remove('show');
+                });
+            });
+        }
+
+        // --- Animated Flowchart Arrows ---
+        const arrowPaths = document.querySelectorAll('.arrow-path');
+        const scienceSection = document.getElementById('science');
+        
+        if (arrowPaths.length > 0 && scienceSection) {
+            const arrowObserverOptions = {
+                root: null,
+                rootMargin: '-20% 0px -20% 0px',
+                threshold: 0.3
+            };
+            
+            const arrowObserverCallback = (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Animate arrows with staggered delay
+                        arrowPaths.forEach((path, index) => {
+                            setTimeout(() => {
+                                path.classList.add('animate');
+                            }, index * 300); // 300ms delay between each arrow
+                        });
+                        arrowObserver.unobserve(entry.target);
+                    }
+                });
+            };
+            
+            const arrowObserver = new IntersectionObserver(arrowObserverCallback, arrowObserverOptions);
+            arrowObserver.observe(scienceSection);
+        }
 
         // --- Benefits Section Scroll-Reveal Logic ---
         const benefitCards = document.querySelectorAll('.benefits-scrolling-content .benefit-card');
