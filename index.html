@@ -814,10 +814,9 @@
         /* --- Science Section (Bento Grid) --- */
         .science-bento-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(2, 1fr);
+            grid-template-columns: repeat(3, minmax(260px, 1fr));
+            grid-auto-rows: 260px; /* fixed card height to avoid overlap on zoom */
             gap: 1.5rem;
-            height: 65vh;
             margin-top: 2rem;
         }
 
@@ -832,6 +831,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            overflow: hidden; /* avoid content spilling out on zoom */
         }
 
         .bento-item:hover {
@@ -851,16 +851,27 @@
 
         /* Spanning items in the grid */
         .bento-item--chart {
-            grid-column: 1 / 3;
-            grid-row: 1 / 3;
+            grid-column: span 2;
+            grid-row: span 2; /* large chart spans two rows of fixed height */
+            overflow: visible; /* allow tooltip to extend outside card */
+            position: relative; /* positioning context for tooltip */
         }
         .bento-item--flow {
-            grid-column: 3 / 4;
-            grid-row: 1 / 2;
+            grid-column: auto;
+            grid-row: span 2; /* give flowchart extra vertical space to avoid clipping */
+            overflow: visible; /* allow minor visual overflow if needed */
         }
         .bento-item--text {
-            grid-column: 3 / 4;
-            grid-row: 2 / 3;
+            grid-column: auto;
+            grid-row: auto;
+        }
+        /* Explicit bottom-right info card placement on desktop */
+        .bento-item--info {
+            grid-column: 2; /* bottom-right spot in 3-col grid */
+            grid-row: auto;
+        }
+        .bento-item--ingredients{
+            grid-column: span 2;
         }
         
         .source-text {
@@ -872,10 +883,18 @@
 
         .chart-container, .flowchart-container {
             width: 100%;
-            height: 100%;
+            height: auto; /* let content size within fixed card */
             display: flex;
             flex-direction: column;
             justify-content: center;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+
+        /* Ensure tooltip positions relative to chart area and is not clipped */
+        .chart-container {
+            position: relative;
+            overflow: visible;
         }
         
         /* Line Chart SVG */
@@ -889,7 +908,7 @@
         }
         .nad-chart .axis-label {
             fill: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
+            font-size: 10px;
         }
         .nad-chart .line {
             fill: none;
@@ -927,16 +946,21 @@
             position: absolute;
             background: rgba(0, 0, 0, 0.9);
             color: var(--white);
-            padding: 12px 16px;
+            padding: 0.75rem 1rem;
             border-radius: 8px;
-            font-size: 14px;
-            pointer-events: none;
             opacity: 0;
-            transform: translate(-50%, -100%);
-            transition: opacity 0.3s ease;
-            z-index: 1000;
+            transform: translate(-50%, calc(-100% - 12px));
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            filter: url(#tooltip-shadow);
+            white-space: nowrap;
+            font-size: 14px;
+            line-height: 1.2;
+            text-align: left;
+            max-width: 260px;
             min-width: 180px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000; /* ensure tooltip renders above cards */
         }
         .chart-tooltip.show {
             opacity: 1;
@@ -971,27 +995,45 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.5rem; /* Reduced gap */
+            gap: 0.75rem;
         }
         .flow-item {
-            background-color: var(--body-blue);
+            background: linear-gradient(180deg, rgba(61, 118, 204, 0.2), rgba(61, 118, 204, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(2px);
             color: var(--white);
-            padding: 0.5rem 1rem; /* Reduced padding */
+            padding: 0.6rem 1.1rem;
             border-radius: 20px;
             font-weight: 600;
             text-align: center;
             width: 100%;
-            font-size: 0.9rem;
-            max-width: 250px;
+            font-size: 0.95rem;
+            max-width: 280px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.16);
+            position: relative;
+            transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease, opacity 380ms ease;
+            opacity: 0;
+            transform: translateY(6px);
         }
         .flow-item.dark {
-            background-color: var(--light-accent-blue);
-            color: var(--header-blue);
+            background: linear-gradient(180deg, rgba(133, 193, 255, 0.25), rgba(133, 193, 255, 0.08));
+            color: var(--white);
         }
-        .flow-arrow {
-            color: var(--light-accent-blue);
-            font-size: 1.25rem;
-            line-height: 1;
+        .flow-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(0,0,0,0.22);
+        }
+        .flow-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            box-shadow: 0 0 0 0 rgba(133, 193, 255, 0.45);
+            pointer-events: none;
+        }
+        .flow-item.in-view {
+            opacity: 1;
+            transform: translateY(0);
         }
         
         /* Animated Flowchart Arrows */
@@ -999,20 +1041,35 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 30px;
-            margin: 0.5rem 0;
+            height: 34px;
+            margin: 0.35rem 0;
         }
         .flow-arrow-svg {
-            width: 20px;
-            height: 30px;
+            width: 26px;
+            height: 34px;
+            overflow: visible;
         }
         .arrow-path {
-            stroke-dasharray: 50;
-            stroke-dashoffset: 50;
-            transition: stroke-dashoffset 1.5s ease-in-out;
+            stroke-dasharray: 6 8;
+            stroke-linecap: round;
+            animation: dashFlow 2.2s linear infinite;
+            animation-play-state: paused; /* start paused; JS will run when in view */
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
         }
         .arrow-path.animate {
-            stroke-dashoffset: 0;
+            animation-play-state: running;
+        }
+        
+        @keyframes dashFlow {
+            to { stroke-dashoffset: -28; }
+        }
+        @keyframes flowPulse {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-1px); }
+        }
+        @keyframes flowGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(133, 193, 255, 0.0); }
+            50% { box-shadow: 0 0 18px 0 rgba(133, 193, 255, 0.35); }
         }
 
         /* --- Testimonials Section --- */
@@ -1197,7 +1254,7 @@
                 grid-template-columns: 1fr;
                 height: auto;
             }
-             .bento-item--chart, .bento-item--flow, .bento-item--text {
+             .bento-item--chart, .bento-item--flow, .bento-item--text, .bento-item--info, .bento-item--ingredients {
                 grid-column: 1; 
                 grid-row: auto;
             }
@@ -1333,17 +1390,9 @@
         }
 
         .testimonial-header-content h2 {
-            margin-bottom: 0.75rem;
+            margin-top: 30px;
             text-align: left;
             font-size: 2rem;
-            line-height: 1.1;
-        }
-
-        .testimonial-header-content p {
-            color: var(--body-blue);
-            font-size: 1rem;
-            line-height: 1.6;
-            margin: 0;
         }
 
         .testimonial-header-content h2 {
@@ -1374,6 +1423,17 @@
             /* Spacing between slides */
             --slide-gap: 24px;
             gap: var(--slide-gap);
+        }
+        .testimonial-rating {
+            display: flex;
+            gap: 0.25rem;
+            color: #FFC107; /* A standard gold/yellow for stars */
+            margin-bottom: 1rem;
+            margin-left: 1rem;
+        }
+        .testimonial-rating svg {
+            width: 20px;
+            height: 20px;
         }
 
         /* Subtle staggered animations for cards and stats */
@@ -1419,15 +1479,38 @@
             position: relative;
             z-index: 2;
         }
+        .verified-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #28a745; /* A success/verified green */
+            background-color: #eaf6ec;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            margin-left: 0.75rem;
+        }
 
         .testimonial-content .quote {
-            font-size: 1.125rem;
-            font-style: normal;
+            font-size: 1.25rem; /* Slightly larger */
+            font-style: italic; /* Makes it feel like a real quote */
             color: var(--header-blue);
-            margin-bottom: 1.1rem;
-            line-height: 1.75;
-            letter-spacing: 0.2px;
+            line-height: 1.6; /* Adjust line height for readability */
+            margin-bottom: 1.25rem;
+            position: relative;
+            padding-left: 1.75rem; /* Indent the text */
         }
+
+        .testimonial-content .quote::before {
+            content: '“';
+            font-family: Georgia, serif; /* Use a serif font for classic quotes */
+            font-size: 4rem;
+            color: var(--light-accent-blue);
+            opacity: 0.8;
+            position: absolute;
+            left: -0.5rem;
+            top: -1rem;
+            line-height: 1;
+        }
+
         .testimonial-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 14px 30px rgba(0, 47, 92, 0.12);
@@ -1489,7 +1572,7 @@
             top: 50%;
             transform: translateY(-50%);
             background: rgba(255, 255, 255, 0.9);
-            border: 1px solid #dde6f0;
+            border: 0;
             backdrop-filter: blur(6px);
             border-radius: 50%;
             width: 46px;
@@ -2141,7 +2224,6 @@
         <div class="container testimonials-container">
             <div class="testimonial-header-content">
                 <h2>Real Stories, Real Results</h2>
-                <p class="section-subtitle">See how ChronoNAD+ is making a difference in people's lives.</p>
             </div>
             <div class="testimonial-slider-container">
                 <div class="testimonial-viewport">
@@ -2149,36 +2231,55 @@
                     <!-- Testimonial 1 -->
                     <div class="testimonial-card">
                         <div class="testimonial-content">
+                            <div class="testimonial-rating">
+                                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                            </div>
                             <p class="quote">"I haven't had this much energy since my 20s. It's like a fog has lifted."</p>
                             <div class="testimonial-author-info">
                                 <div class="testimonial-image">
                                     <img src="assets/testimonial-1.jpg" alt="Sarah P.">
                                 </div>
                                 <p class="author">— Sarah P., 45</p>
+                                <span class="verified-badge">✔ Verified Purchase</span>
                             </div>
                         </div>
                     </div>
                     <!-- Testimonial 2 -->
                     <div class="testimonial-card">
                         <div class="testimonial-content">
+                            <div class="testimonial-rating">
+                                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                                
+                            </div>
                             <p class="quote">"My focus at work has improved dramatically. I feel sharper and more productive than ever."</p>
                             <div class="testimonial-author-info">
                                 <div class="testimonial-image">
                                     <img src="assets/testimonial-2.jpg" alt="Mark L.">
                                 </div>
                                 <p class="author">— Mark L., 52</p>
+                                <span class="verified-badge">✔ Verified Purchase</span>
                             </div>
                         </div>
                     </div>
                     <!-- Testimonial 3 -->
                     <div class="testimonial-card">
                         <div class="testimonial-content">
+                            
                             <p class="quote">"As a fitness enthusiast, I've noticed a real difference in my recovery times. I bounce back faster after tough workouts."</p>
+                            
                             <div class="testimonial-author-info">
                                 <div class="testimonial-image">
                                     <img src="assets/testimonial-3.jpg" alt="Jessica A.">
                                 </div>
                                 <p class="author">— Jessica A., 38</p>
+                                <span class="verified-badge">✔ Verified Purchase</span>
                             </div>
                         </div>
                     </div>
@@ -2269,20 +2370,47 @@
                         <div class="flowchart">
                             <div class="flow-item">Resveratrol</div>
                             <div class="flow-arrow-container">
-                                <svg class="flow-arrow-svg" viewBox="0 0 20 40">
-                                    <path class="arrow-path" d="M 10 5 L 10 30 M 5 25 L 10 30 L 15 25" stroke="var(--light-accent-blue)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                <svg class="flow-arrow-svg" viewBox="0 0 40 60">
+                                    <defs>
+                                        <linearGradient id="flowGrad1" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="rgba(133,193,255,0.95)"/>
+                                            <stop offset="100%" stop-color="rgba(133,193,255,0.55)"/>
+                                        </linearGradient>
+                                        <marker id="arrowHead1" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+                                            <path d="M0,0 L10,5 L0,10 Z" fill="var(--light-accent-blue)"/>
+                                        </marker>
+                                    </defs>
+                                    <path class="arrow-path" d="M 20 6 C 20 22, 20 22, 20 38" stroke="url(#flowGrad1)" stroke-width="2.25" fill="none" marker-end="url(#arrowHead1)"/>
                                 </svg>
                             </div>
                             <div class="flow-item">Activates "Longevity" Genes*</div>
                             <div class="flow-arrow-container">
-                                <svg class="flow-arrow-svg" viewBox="0 0 20 40">
-                                    <path class="arrow-path" d="M 10 5 L 10 30 M 5 25 L 10 30 L 15 25" stroke="var(--light-accent-blue)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                <svg class="flow-arrow-svg" viewBox="0 0 40 60">
+                                    <defs>
+                                        <linearGradient id="flowGrad2" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="rgba(133,193,255,0.95)"/>
+                                            <stop offset="100%" stop-color="rgba(133,193,255,0.55)"/>
+                                        </linearGradient>
+                                        <marker id="arrowHead2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+                                            <path d="M0,0 L10,5 L0,10 Z" fill="var(--light-accent-blue)"/>
+                                        </marker>
+                                    </defs>
+                                    <path class="arrow-path" d="M 20 6 C 20 22, 20 22, 20 38" stroke="url(#flowGrad2)" stroke-width="2.25" fill="none" marker-end="url(#arrowHead2)"/>
                                 </svg>
                             </div>
                             <div class="flow-item">Boosts NAD+'s Function*</div>
                             <div class="flow-arrow-container">
-                                <svg class="flow-arrow-svg" viewBox="0 0 20 40">
-                                    <path class="arrow-path" d="M 10 5 L 10 30 M 5 25 L 10 30 L 15 25" stroke="var(--light-accent-blue)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                <svg class="flow-arrow-svg" viewBox="0 0 40 60">
+                                    <defs>
+                                        <linearGradient id="flowGrad3" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="rgba(133,193,255,0.95)"/>
+                                            <stop offset="100%" stop-color="rgba(133,193,255,0.55)"/>
+                                        </linearGradient>
+                                        <marker id="arrowHead3" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+                                            <path d="M0,0 L10,5 L0,10 Z" fill="var(--light-accent-blue)"/>
+                                        </marker>
+                                    </defs>
+                                    <path class="arrow-path" d="M 20 6 C 20 22, 20 22, 20 38" stroke="url(#flowGrad3)" stroke-width="2.25" fill="none" marker-end="url(#arrowHead3)"/>
                                 </svg>
                             </div>
                             <div class="flow-item dark">Enhanced Cellular Health</div>
@@ -2295,6 +2423,11 @@
                     <h3>The Synergistic Effect</h3>
                     <p>Our formula combines NAD+ precursors with Resveratrol. This creates a synergistic effect for enhanced cellular health and defense.</p>
                     <p class="source-text">Source: Jiang et al., 2022.</p>
+                </div>
+                <div class="bento-item bento-item--ingredients">
+                    <h3>Purity-Tested Ingredients</h3>
+                    <p>Each ingredient is rigorously tested for purity and potency, ensuring you receive a high-quality, effective supplement every time.</p>
+                    <p class="source-text">In-house quality assurance data.</p>
                 </div>
             </div>
         </div>
@@ -2514,11 +2647,12 @@
             });
         }
 
-        // --- Animated Flowchart Arrows ---
+        // --- Animated Flowchart Arrows & Flow Items Reveal ---
         const arrowPaths = document.querySelectorAll('.arrow-path');
+        const flowItems = document.querySelectorAll('.bento-item--flow .flow-item');
         const scienceSection = document.getElementById('science');
         
-        if (arrowPaths.length > 0 && scienceSection) {
+        if ((arrowPaths.length > 0 || flowItems.length > 0) && scienceSection) {
             const arrowObserverOptions = {
                 root: null,
                 rootMargin: '-20% 0px -20% 0px',
@@ -2529,11 +2663,20 @@
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         // Animate arrows with staggered delay
-                        arrowPaths.forEach((path, index) => {
-                            setTimeout(() => {
-                                path.classList.add('animate');
-                            }, index * 300); // 300ms delay between each arrow
-                        });
+                        if (arrowPaths.length > 0) {
+                            arrowPaths.forEach((path, index) => {
+                                setTimeout(() => {
+                                    path.classList.add('animate');
+                                }, index * 300); // 300ms delay between each arrow
+                            });
+                        }
+
+                        // Reveal flow items with faster stagger
+                        if (flowItems.length > 0) {
+                            flowItems.forEach((item, idx) => {
+                                setTimeout(() => item.classList.add('in-view'), idx * 120);
+                            });
+                        }
                         arrowObserver.unobserve(entry.target);
                     }
                 });
