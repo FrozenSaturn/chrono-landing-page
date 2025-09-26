@@ -207,7 +207,7 @@
         }
 
         .grid-cell {
-            background-color: rgba(0, 87, 166, 0.07);
+            background-color: rgba(0, 86, 166, 0.05);
             position: relative;
             overflow: hidden;
         }
@@ -223,16 +223,19 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: 0.1;
+            opacity: 0.08;
             filter: grayscale(100%) sepia(30%) hue-rotate(200deg) brightness(0.8);
             transition: opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease;
             border-radius: 2px;
+            /* Slow alternating flicker */
+            animation: hero-flicker 10s ease-in-out infinite;
         }
 
         .grid-cell:hover img {
             opacity: 0.4;
             transform: scale(1.08);
             filter: grayscale(80%) sepia(40%) hue-rotate(200deg) brightness(0.9);
+            animation-play-state: paused; /* pause flicker on hover */
         }
 
         .grid-cell.with-image {
@@ -256,6 +259,10 @@
             z-index: 2;
         }
 
+        /* Alternate groups so some are visible while others are dim, then swap */
+        .grid-cell.with-image:nth-child(odd) img { animation-delay: 0s; }
+        .grid-cell.with-image:nth-child(even) img { animation-delay: 7s; }
+
         .grid-cell.with-image {
             animation: subtle-pulse 6s ease-in-out infinite;
         }
@@ -269,6 +276,16 @@
                 transform: scale(1.02);
                 opacity: 0.95;
             }
+        }
+
+        /* Slow flicker: fade in, hold, fade out, hold (alternates via delay) */
+        @keyframes hero-flicker {
+            0%   { opacity: 0.06; }
+            10%  { opacity: 0.10; }
+            45%  { opacity: 0.25; }
+            55%  { opacity: 0.08; }
+            90%  { opacity: 0.08; }
+            100% { opacity: 0.06; }
         }
 
         .grid-cell.with-image:nth-child(odd) {
@@ -597,16 +614,15 @@
             width: 100%;
             height: 100px;
             background: linear-gradient(45deg, var(--off-white) 0%, var(--off-white) 50%, transparent 51%);
-            transform: translateY(99px);
             z-index: 1;
         }
         
         .section-science {
             background-color: var(--header-blue);
-            min-height: 100vh;
             display: flex;
             align-items: center;
             position: relative;
+            z-index: 2;
         }
 
         .section-science::before {
@@ -616,8 +632,6 @@
             left: 0;
             width: 100%;
             height: 100px;
-            background: linear-gradient(135deg, transparent 49%, var(--header-blue) 50%, var(--header-blue) 100%);
-            transform: translateY(-99px);
             z-index: 1;
         }
 
@@ -1022,12 +1036,18 @@
 
         .testimonial-card {
             background: var(--white);
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            border-radius: 20px;
+            padding: 2.25rem;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            border: 1px solid #e6eef7;
+            box-shadow: 0 10px 24px rgba(0, 47, 92, 0.08);
+        }
+
+        .testimonial-card:focus-within {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 2px;
         }
 
         .testimonial-card::before {
@@ -1037,30 +1057,19 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, var(--accent-blue), var(--light-accent-blue));
-        }
-
-        .testimonial-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
-        }
-
-        .testimonial-content {
-            margin-bottom: 1.5rem;
         }
 
         .testimonial-quote {
             font-size: 1.1rem;
-            line-height: 1.6;
+            line-height: 2;
             color: var(--text-dark);
-            font-style: italic;
             margin-bottom: 1rem;
             position: relative;
         }
 
         .testimonial-quote::before {
             content: '"';
-            font-size: 3rem;
+            font-size: 1.5rem;
             color: var(--accent-blue);
             position: absolute;
             top: -10px;
@@ -1069,41 +1078,7 @@
             opacity: 0.3;
         }
 
-        .testimonial-author {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
 
-        .testimonial-photo {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--light-accent-blue);
-        }
-
-        .testimonial-info h4 {
-            margin: 0;
-            font-size: 1rem;
-            color: var(--text-dark);
-            font-weight: 600;
-        }
-
-        .testimonial-info p {
-            margin: 0;
-            font-size: 0.9rem;
-            color: var(--text-light);
-        }
-
-        .testimonials-stats {
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            margin-top: 3rem;
-            padding: 2rem 0;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-        }
 
         .stat-item {
             text-align: center;
@@ -1331,7 +1306,251 @@
                 font-size: 2rem;
             }
         }
-    </style>
+        /* --- Testimonials Section --- */
+        .section-testimonials {
+            background-color: #f1f1f1; 
+            position: relative;
+        }
+        .section-testimonials .section-subtitle {
+            text-align: left;
+            margin: 0 0 2rem 0;
+        }
+
+        .testimonials-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            align-items: center;
+            gap: 5rem;
+        }
+
+        .testimonial-header-content {
+            text-align: left;
+            max-width: 520px;
+            line-height: 1.2;
+            align-self: start;
+            position: relative;
+            z-index: 3; /* keep header text above sliding cards */
+        }
+
+        .testimonial-header-content h2 {
+            margin-bottom: 0.75rem;
+            text-align: left;
+            font-size: 2rem;
+            line-height: 1.1;
+        }
+
+        .testimonial-header-content p {
+            color: var(--body-blue);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .testimonial-header-content h2 {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .testimonial-slider-container {
+            position: relative;
+            width: 100%;
+            /* Allow nav buttons to sit slightly outside without being clipped */
+            overflow: visible;
+            padding: 0 2rem; /* breathing room so cards don't touch edges */
+            z-index: 1; /* place slider below header column */
+        }
+
+        /* Viewport clips the moving track so it never overlaps the header */
+        .testimonial-viewport {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            border-radius: 18px; /* optional: match card rounding for clean edges */
+        }
+
+        .testimonial-slider {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            /* Spacing between slides */
+            --slide-gap: 24px;
+            gap: var(--slide-gap);
+        }
+
+        /* Subtle staggered animations for cards and stats */
+        .benefits-scrolling-content .benefit-card.fade-in-up { transition-delay: 60ms; }
+        .benefits-scrolling-content .benefit-card.fade-in-up:nth-child(2) { transition-delay: 140ms; }
+        .benefits-scrolling-content .benefit-card.fade-in-up:nth-child(3) { transition-delay: 220ms; }
+
+        .section-testimonials .testimonial-card.fade-in-up { transition-delay: 80ms; }
+        .section-testimonials .testimonial-card.fade-in-up:nth-child(2) { transition-delay: 160ms; }
+        .section-testimonials .testimonial-card.fade-in-up:nth-child(3) { transition-delay: 240ms; }
+
+        .showcase-stats .stat-item.fade-in-up { transition-delay: 60ms; }
+        .showcase-stats .stat-item.fade-in-up:nth-child(2) { transition-delay: 140ms; }
+        .showcase-stats .stat-item.fade-in-up:nth-child(3) { transition-delay: 220ms; }
+        .showcase-stats .stat-item.fade-in-up:nth-child(4) { transition-delay: 300ms; }
+
+        .testimonial-card {
+            flex: 0 0 100%;
+            background: var(--white);
+            border-radius: 18px;
+            padding: 2rem 2.25rem;
+            border: 1px solid #e9f0f7;
+            box-shadow: 0 12px 32px rgba(0, 47, 92, 0.08);
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+            transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+            z-index: 1; /* base layer under the active card */
+        }
+
+        .testimonial-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--accent-blue), rgba(0,87,166,0.15));
+            z-index: 1;
+        }
+
+        .testimonial-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .testimonial-content .quote {
+            font-size: 1.125rem;
+            font-style: normal;
+            color: var(--header-blue);
+            margin-bottom: 1.1rem;
+            line-height: 1.75;
+            letter-spacing: 0.2px;
+        }
+        .testimonial-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 30px rgba(0, 47, 92, 0.12);
+        }
+
+        /* Active/Inactive slide states */
+        .testimonial-card.active { opacity: 1; z-index: 2; }
+        .testimonial-card.inactive { opacity: 0.55; }
+
+        .testimonial-author-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .testimonial-image {
+            flex-shrink: 0;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--light-accent-blue);
+            box-shadow: 0 2px 6px rgba(0, 47, 92, 0.12);
+        }
+
+        .testimonial-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .testimonial-content .author {
+            font-weight: 600;
+            color: var(--body-blue);
+            margin: 0;
+            letter-spacing: 0.2px;
+        }
+
+        .testimonial-author-info {
+            margin-top: 1.1rem;
+            padding-top: 0.9rem;
+            border-top: 1px solid #edf2f9;
+        }
+
+        .testimonial-card:hover {
+            border-color: #dbe7f5;
+        }
+
+        .slider-controls {
+            position: absolute;
+            inset: 0; /* anchor to container */
+            display: block; /* we will position individual buttons */
+            pointer-events: none; /* let clicks pass except on buttons */
+            z-index: 10;
+        }
+
+        .slider-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #dde6f0;
+            backdrop-filter: blur(6px);
+            border-radius: 50%;
+            width: 46px;
+            height: 46px;
+            cursor: pointer;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.25rem;
+            color: var(--primary-blue);
+            box-shadow: 0 6px 18px rgba(0, 47, 92, 0.12);
+            transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+            pointer-events: auto; /* clickable */
+        }
+
+        .slider-btn:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+            box-shadow: 0 10px 24px rgba(0, 87, 166, 0.18);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .slider-btn.prev-btn { left: -8px; }
+        .slider-btn.next-btn { right: -8px; }
+
+        .slider-btn:disabled {
+            opacity: 0.45;
+            filter: grayscale(20%);
+            cursor: default;
+            box-shadow: none;
+        }
+
+        @media (max-width: 992px) {
+            .testimonials-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .testimonial-header-content {
+                max-width: 100%;
+                text-align: left;
+            }
+
+            .testimonial-slider-container { padding: 0 1.5rem; }
+            .slider-btn.prev-btn { left: 4px; }
+            .slider-btn.next-btn { right: 4px; }
+        }
+
+        @media (max-width: 576px) {
+            .testimonial-card {
+                padding: 1.5rem 1.25rem 1.5rem 1.25rem;
+                border-radius: 16px;
+                box-shadow: 0 8px 18px rgba(0, 47, 92, 0.08);
+            }
+            .testimonial-content .quote {
+                font-size: 1.05rem;
+            }
+            .slider-btn { width: 40px; height: 40px; font-size: 1.1rem; }
+        }
+
+</style>
 </head>
 <body>
     <div class="cursor-dot"></div>
@@ -1355,6 +1574,7 @@
                 <li><a href="#home">Home</a></li>
                 <li><a href="#product">The Product</a></li>
                 <li><a href="#benefits">Benefits</a></li>
+                <li><a href="#testimonials">Testimonials</a></li>
                 <li><a href="#science">Science</a></li>
                 <li><a href="#" class="btn btn-primary">Shop Now</a></li>
             </ul>
@@ -1369,7 +1589,7 @@
             <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Person 1"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
-            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Person 11"></div>
+            <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
@@ -1390,9 +1610,9 @@
             <!-- Row 2 -->
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
-            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Person 3"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell "></div>
+            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Person 3"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
@@ -1410,7 +1630,7 @@
             <div class="grid-cell"></div>
             
             <!-- Row 3 -->
-            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Person 4"></div>
+            <div class="grid-cell "></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
@@ -1448,7 +1668,7 @@
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
-            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face" alt="Person 6"></div>
+            <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell "></div>
             <div class="grid-cell"></div>
@@ -1697,6 +1917,11 @@
             
             <!-- Row 16 -->
             <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
             <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Person 3"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
@@ -1711,17 +1936,12 @@
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=face" alt="Person 9"></div>
             
             <!-- Row 17 -->
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
-            <div class="grid-cell with-image"> <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face" alt="Person 7"></div>
+            <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
@@ -1740,9 +1960,6 @@
             <div class="grid-cell"></div>
             
             <!-- Row 18 -->
-            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Person 4"></div>
-            <div class="grid-cell"></div>
-            <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
@@ -1758,6 +1975,9 @@
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Person 8"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             
@@ -1799,7 +2019,7 @@
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
-            <div class="grid-cell with-image"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face" alt="Person 5"></div>
+            <div class="grid-cell with-image"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
             <div class="grid-cell"></div>
@@ -1911,6 +2131,61 @@
                         <h3>Cellular Defense &amp; DNA Repair</h3>
                         <p>Activates 'longevity genes' and powers DNA repair processes, helping your body fight off stress and maintain overall wellness.</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="section section-testimonials fade-in-up" id="testimonials">
+        <div class="container testimonials-container">
+            <div class="testimonial-header-content">
+                <h2>Real Stories, Real Results</h2>
+                <p class="section-subtitle">See how ChronoNAD+ is making a difference in people's lives.</p>
+            </div>
+            <div class="testimonial-slider-container">
+                <div class="testimonial-viewport">
+                    <div class="testimonial-slider">
+                    <!-- Testimonial 1 -->
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <p class="quote">"I haven't had this much energy since my 20s. It's like a fog has lifted."</p>
+                            <div class="testimonial-author-info">
+                                <div class="testimonial-image">
+                                    <img src="assets/testimonial-1.jpg" alt="Sarah P.">
+                                </div>
+                                <p class="author">— Sarah P., 45</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Testimonial 2 -->
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <p class="quote">"My focus at work has improved dramatically. I feel sharper and more productive than ever."</p>
+                            <div class="testimonial-author-info">
+                                <div class="testimonial-image">
+                                    <img src="assets/testimonial-2.jpg" alt="Mark L.">
+                                </div>
+                                <p class="author">— Mark L., 52</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Testimonial 3 -->
+                    <div class="testimonial-card">
+                        <div class="testimonial-content">
+                            <p class="quote">"As a fitness enthusiast, I've noticed a real difference in my recovery times. I bounce back faster after tough workouts."</p>
+                            <div class="testimonial-author-info">
+                                <div class="testimonial-image">
+                                    <img src="assets/testimonial-3.jpg" alt="Jessica A.">
+                                </div>
+                                <p class="author">— Jessica A., 38</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slider-controls">
+                    <button class="slider-btn prev-btn">&lt;</button>
+                    <button class="slider-btn next-btn">&gt;</button>
                 </div>
             </div>
         </div>
@@ -2114,6 +2389,11 @@
             });
         }
 
+        // --- Prepare stagger targets (add fade-in-up to individual items before observing) ---
+        document.querySelectorAll('.benefits-scrolling-content .benefit-card').forEach(el => el.classList.add('fade-in-up'));
+        document.querySelectorAll('.section-testimonials .testimonial-card').forEach(el => el.classList.add('fade-in-up'));
+        document.querySelectorAll('.showcase-stats .stat-item').forEach(el => el.classList.add('fade-in-up'));
+
         // --- Intersection Observer for Fade-in Animations ---
         const observerOptions = {
             root: null,
@@ -2133,6 +2413,68 @@
         const observer = new IntersectionObserver(observerCallback, observerOptions);
         const elementsToAnimate = document.querySelectorAll('.fade-in-up');
         elementsToAnimate.forEach(el => observer.observe(el));
+
+        // --- Stat Counter Animation (Product Showcase / Testimonials) ---
+        function animateCount(el, targetValue, options = {}) {
+            const duration = options.duration || 1400;
+            const decimals = options.decimals || 0;
+            const startTime = performance.now();
+
+            function frame(now) {
+                const elapsed = now - startTime;
+                const t = Math.min(1, elapsed / duration);
+                // easeOutCubic
+                const eased = 1 - Math.pow(1 - t, 3);
+                const value = targetValue * eased;
+                el.textContent = value.toFixed(decimals);
+                if (t < 1) requestAnimationFrame(frame);
+                else el.textContent = targetValue.toFixed(decimals);
+            }
+            requestAnimationFrame(frame);
+        }
+
+        function setupStatCounters() {
+            const statEls = document.querySelectorAll('.stat-number');
+            if (statEls.length === 0) return;
+
+            const parseStat = (text) => {
+                const raw = text.trim();
+                const hasK = /k/i.test(raw);
+                const hasM = /m/i.test(raw);
+                const unitChar = hasK ? 'k' : (hasM ? 'm' : '');
+                const numericPart = parseFloat(raw.replace(/[^\d.]/g, '')) || 0;
+                const decimals = (numericPart % 1 !== 0) ? 1 : 0;
+                // Build display suffix preserving unit (k/m) and other symbols like +, %, x
+                const otherSuffix = raw.replace(/[\d.]/g, '').replace(new RegExp(unitChar, 'i'), '');
+                const displaySuffix = unitChar + otherSuffix;
+                return { numericPart, unitChar, displaySuffix, decimals };
+            };
+
+            const counterObserver = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    const el = entry.target;
+                    if (el.dataset.counted === '1') { obs.unobserve(el); return; }
+
+                    const original = el.textContent || '';
+                    const { numericPart, unitChar, displaySuffix, decimals } = parseStat(original);
+
+                    // If using unitChar (k/m), we count to the displayed numericPart and keep the unit suffix
+                    el.textContent = (0).toFixed(decimals) + displaySuffix;
+                    animateCount({
+                        set textContent(v) { el.textContent = v + displaySuffix; },
+                        get textContent() { return el.textContent; }
+                    }, numericPart, { duration: 1400, decimals });
+
+                    el.dataset.counted = '1';
+                    obs.unobserve(el);
+                });
+            }, { root: null, rootMargin: '0px 0px -10% 0px', threshold: 0.2 });
+
+            statEls.forEach(el => counterObserver.observe(el));
+        }
+
+        setupStatCounters();
 
         // --- Chart Tooltips ---
         const chartTooltip = document.getElementById('chart-tooltip');
@@ -2285,6 +2627,76 @@
             document.addEventListener('mouseleave', () => {
                 document.body.classList.remove('cursor-active');
             });
+        }
+
+        // --- Testimonial Slider ---
+        const slider = document.querySelector('.testimonial-slider');
+        const sliderContainer = document.querySelector('.testimonial-slider-container');
+        const viewport = document.querySelector('.testimonial-viewport');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        const slides = document.querySelectorAll('.testimonial-card');
+
+        if (slider && sliderContainer && viewport && prevBtn && nextBtn && slides.length > 0) {
+            let currentIndex = 0;
+            let animating = false;
+
+            function setActiveIndex(index) {
+                slides.forEach((s, i) => {
+                    s.classList.toggle('active', i === index);
+                    s.classList.toggle('inactive', i !== index);
+                });
+                prevBtn.disabled = index === 0;
+                nextBtn.disabled = index === slides.length - 1;
+            }
+
+            function getGapPx() {
+                const styles = window.getComputedStyle(slider);
+                const gap = parseFloat(styles.gap || '0');
+                return isNaN(gap) ? 0 : gap;
+            }
+
+            function applyTransform() {
+                const slideWidth = viewport.clientWidth; // clip within viewport width
+                const gapPx = getGapPx();
+                const offset = currentIndex * (slideWidth + gapPx);
+                slider.style.transform = `translateX(-${offset}px)`;
+            }
+
+            function goToSlide(index) {
+                if (animating) return; // prevent spamming during transition
+                const targetIndex = Math.max(0, Math.min(index, slides.length - 1));
+                if (targetIndex === currentIndex) return;
+
+                // Keep current slide on top during animation
+                const prevIndex = currentIndex;
+
+                // Temporarily maintain previous as active so it sits above
+                setActiveIndex(prevIndex);
+
+                // Apply transform to move to target
+                currentIndex = targetIndex;
+                applyTransform();
+                animating = true;
+
+                const onDone = () => {
+                    // Now mark the new slide as active once animation completes
+                    setActiveIndex(currentIndex);
+                    animating = false;
+                    slider.removeEventListener('transitionend', onDone);
+                };
+                slider.addEventListener('transitionend', onDone);
+            }
+
+            // Init
+            setActiveIndex(currentIndex);
+            applyTransform();
+
+            prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+            nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+
+            // Recalculate on resize
+            window.addEventListener('resize', applyTransform);
         }
 
     </script>
