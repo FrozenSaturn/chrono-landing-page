@@ -22,6 +22,121 @@
             --gray: #6c757d;
         }
 
+        /* --- Mini Cart --- */
+        .cart-wrapper {
+            position: relative;
+            margin-left: 1rem;
+        }
+        .cart-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: transparent;
+            border: 1px solid rgba(0, 87, 166, 0.2);
+            color: var(--header-blue);
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-weight: 700;
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .cart-button:hover { 
+            background-color: rgba(0, 87, 166, 0.07);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 87, 166, 0.15);
+        }
+        .cart-icon { width: 20px; height: 20px; display: inline-block; color: var(--body-blue); }
+        .cart-text { display: none; }
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background: var(--body-blue);
+            color: var(--white);
+            border-radius: 999px;
+            font-size: 0.75rem;
+            line-height: 1;
+        }
+        .mini-cart-panel {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 380px;
+            background: var(--white);
+            border: 1px solid rgba(0, 47, 92, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 24px 60px rgba(0, 47, 92, 0.18);
+            padding: 0.75rem 0.75rem 1rem 0.75rem;
+            display: none;
+            z-index: 1200;
+        }
+        .mini-cart-panel.open { display: block; }
+        .mini-cart-header { display:flex; align-items:center; justify-content: space-between; padding: 0.25rem 0.75rem 0.75rem 0.75rem; border-bottom: 1px solid rgba(0,47,92,0.08); }
+        .mini-cart-subheader { font-size: 0.95rem; opacity: 0.8; }
+        .mini-cart-items { max-height: 300px; overflow:auto; list-style:none; margin: 0.25rem 0 0.75rem 0; padding: 0.25rem 0.25rem 0 0.25rem; }
+        .mini-cart-item { display:flex; align-items:center; justify-content: space-between; gap: 0.5rem; padding: 0.6rem 0.5rem; border-radius: 10px; background: rgba(0,87,166,0.04); }
+        .mini-cart-item + .mini-cart-item { margin-top: 0.5rem; }
+        .mini-cart-thumb { width: 56px; height: 56px; border-radius: 10px; overflow: hidden; background: #f2f6fb; display:flex; align-items:center; justify-content:center; }
+        .mini-cart-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .mini-cart-item .info { display:flex; flex-direction: column; flex: 1; }
+        .mini-cart-item .name { font-weight: 700; color: var(--header-blue); }
+        .mini-cart-item .meta { font-size: 0.9rem; opacity: 0.8; }
+        .mini-cart-remove { background: transparent; border: none; color: var(--gray); cursor: pointer; padding: 0.25rem; border-radius: 6px; }
+        .mini-cart-remove:hover { color: var(--body-blue); background: rgba(0,87,166,0.09); }
+        .mini-cart-breakdown { border-top: 1px solid rgba(0,47,92,0.08); margin-top: 0.25rem; padding: 0.6rem 0.75rem; }
+        .mini-row { display:flex; align-items:center; justify-content: space-between; padding: 0.45rem 0; }
+        .mini-row.total { border-top: 1px dashed rgba(0,47,92,0.2); margin-top: 0.4rem; padding-top: 0.7rem; font-weight: 800; color: var(--header-blue); }
+        .mini-actions { display:flex; gap: 0.5rem; padding: 0.5rem 0.75rem 0 0.75rem; }
+        .btn-outline { background: var(--white); color: var(--body-blue); border: 1px solid rgba(0,87,166,0.25); padding: 0.6rem 1rem; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .btn-checkout { background: var(--body-blue); color: var(--white); border: none; padding: 0.6rem 1rem; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .btn-checkout:hover { box-shadow: 0 10px 20px rgba(0, 87, 166, 0.25); transform: translateY(-2px); }
+
+        @media (max-width: 768px) {
+            .cart-wrapper { margin-left: 0.5rem; }
+            .mini-cart-panel { right: 0; width: min(92vw, 420px); }
+        }
+
+        /* Empty cart state */
+        .mini-cart-empty { display: none; text-align: center; padding: 2.25rem 1rem; }
+        .mini-cart-empty p { margin-bottom: 1rem; font-weight: 600; }
+        .cart-is-empty .mini-cart-breakdown, .cart-is-empty .mini-actions { display: none; }
+        .cart-is-empty .mini-cart-empty { display: block; }
+
+        /* --- Products Carousel --- */
+        .products-section { background: #eef3f7; }
+        .products-header { text-align: center; margin-bottom: 1rem; }
+        .products-subtitle { text-align:center; color: var(--gray); margin-bottom: 2rem; }
+        .product-viewport { overflow: hidden; width: 100%; }
+        .product-slider { display: flex; gap: 1.25rem; transition: transform 0.45s ease; }
+        .product-card { flex: 0 0 calc(100% - 2px); background: var(--white); border: 1px solid rgba(0,47,92,0.08); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,47,92,0.08); display:flex; align-items: stretch; overflow: hidden; }
+        .product-media { flex: 1 1 50%; display:flex; align-items:center; justify-content:center; background: linear-gradient(180deg, rgba(0,87,166,0.05), rgba(0,87,166,0.0)); padding: 1rem; overflow: hidden; }
+        .product-media img { max-width: 100%; height: auto; object-fit: contain; transition: transform 0.35s ease; }
+        .product-info { flex: 1 1 50%; padding: 1.25rem; display:flex; flex-direction: column; justify-content: center; gap: 0.5rem; }
+        .product-title { font-size: 1.4rem; }
+        .product-price { font-weight: 700; color: var(--header-blue); font-size: 1.2rem; }
+        .product-actions { margin-top: 0.5rem; }
+        .products-controls { margin-top: 1rem; display:flex; justify-content: center; gap: 0.75rem; }
+        .products-controls .slider-btn { background: var(--white); border: 1px solid rgba(0,47,92,0.15); border-radius: 10px; }
+        .product-rating { font-size: 0.95rem; color: #f59e0b; display:flex; align-items:center; gap: 0.35rem; }
+        .product-rating .count { color: var(--gray); font-size: 0.9rem; }
+        .product-quantity { font-size: 0.95rem; color: var(--gray); }
+        @media (min-width: 640px) {
+            .product-card { flex: 0 0 calc(50% - 0.625rem); }
+        }
+        @media (min-width: 992px) {
+            .product-card { flex: 0 0 calc(50% - 0.625rem); }
+        }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 18px 42px rgba(0,47,92,0.14); }
+        .product-card:hover .product-media img { transform: scale(1.05); }
+
         * {
             margin: 0;
             padding: 0;
@@ -361,6 +476,13 @@
             transform: translateY(-3px);
             box-shadow: 0 15px 30px rgba(0, 87, 166, 0.3);
         }
+
+        /* Add-to-cart feedback animation */
+        .add-to-cart { position: relative; overflow: hidden; }
+        .add-to-cart .btn-text, .add-to-cart .btn-feedback { display: block; transition: transform 0.3s ease; }
+        .add-to-cart .btn-feedback { position: absolute; inset: 0; display:flex; align-items:center; justify-content:center; transform: translateY(100%); background-color: #28a745; }
+        .add-to-cart.is-added .btn-text { transform: translateY(-100%); }
+        .add-to-cart.is-added .btn-feedback { transform: translateY(0); }
 
         .btn-secondary {
             background-color: transparent;
@@ -1450,6 +1572,10 @@
         .showcase-stats .stat-item.fade-in-up:nth-child(3) { transition-delay: 220ms; }
         .showcase-stats .stat-item.fade-in-up:nth-child(4) { transition-delay: 300ms; }
 
+        /* Shop products subtle stagger */
+        .products-section .product-card.fade-in-up { transition-delay: 80ms; }
+        .products-section .product-card.fade-in-up:nth-child(2) { transition-delay: 160ms; }
+
         .testimonial-card {
             flex: 0 0 100%;
             background: var(--white);
@@ -1656,11 +1782,47 @@
             <ul class="nav-menu" id="navMenu">
                 <li><a href="#home">Home</a></li>
                 <li><a href="#product">The Product</a></li>
+                <li><a href="#shop">Shop</a></li>
                 <li><a href="#benefits">Benefits</a></li>
                 <li><a href="#testimonials">Testimonials</a></li>
                 <li><a href="#science">Science</a></li>
-                <li><a href="#" class="btn btn-primary">Shop Now</a></li>
             </ul>
+            <div class="cart-wrapper" id="miniCart">
+                <button class="cart-button" id="cartToggle" aria-haspopup="dialog" aria-expanded="false" aria-label="Open cart">
+                    <span class="cart-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 6h15l-1.5 9h-12L6 4H3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="cart-text">Cart</span>
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+                <div class="mini-cart-panel" id="miniCartPanel" role="dialog" aria-label="Mini cart" aria-modal="false">
+                    <div class="mini-cart-header">
+                        <div>
+                            <strong>Items Selected</strong>
+                            <div class="mini-cart-subheader"><span id="cartHeaderCount">0</span> Items Selected</div>
+                        </div>
+                        <button class="btn btn-secondary" id="cartClose" style="padding: 0.3rem 0.6rem;">Close</button>
+                    </div>
+                    <ul class="mini-cart-items" id="miniCartItems"></ul>
+                    <div class="mini-cart-empty" id="cartEmptyState">
+                        <p>Your cart is currently empty.</p>
+                        <a href="#shop" class="btn btn-secondary">Start Shopping</a>
+                    </div>
+                    <div class="mini-cart-breakdown">
+                        <div class="mini-row"><span>Subtotal</span><span id="rowSubtotal">$0.00</span></div>
+                        <div class="mini-row"><span>Coupon Code</span><span id="rowCoupon">—</span></div>
+                        <div class="mini-row"><span>Shipping Fee</span><span id="rowShipping">$0.00</span></div>
+                        <div class="mini-row"><span>Tax</span><span id="rowTax">$0.00</span></div>
+                        <div class="mini-row total"><span>Total</span><span id="rowTotal">$0.00</span></div>
+                    </div>
+                    <div class="mini-actions">
+                        <button class="btn-outline" type="button" id="viewCartBtn">View Cart</button>
+                        <button class="btn-checkout" id="checkoutBtn" type="button">Checkout</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -2163,6 +2325,64 @@
                  <div class="stat-item">
                     <div class="stat-number">24</div>
                     <div class="stat-label">Month Stability Testing</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Carousel (Shop) -->
+    <section class="section products-section fade-in-up" id="shop">
+        <div class="container">
+            <div class="products-header">
+                <h2>Shop Featured Products</h2>
+                <p class="products-subtitle">Premium quality, science-backed. Add to cart in one click.</p>
+            </div>
+            <div class="product-viewport">
+                <div class="product-slider" id="productSlider">
+                    <!-- Product 1: ChronoNAD+ -->
+                    <article class="product-card">
+                        <div class="product-media">
+                            <img src="assets/ChronoNAD+.png" alt="ChronoNAD+ bottle" loading="lazy">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">ChronoNAD+</h3>
+                            <div class="product-rating" aria-label="Rated 4.8 out of 5">
+                                <span>★★★★★</span>
+                                <span class="count">(1,247 reviews)</span>
+                            </div>
+                            <p>Daily NAD+ support for cellular energy and vitality.</p>
+                            <div class="product-quantity">90 Capsules • 30 Servings</div>
+                            <div class="product-price" data-price="34.99">$34.99</div>
+                            <div class="product-actions">
+                                <button class="btn btn-primary add-to-cart" data-id="chrononad" data-name="ChronoNAD+" data-price="34.99" data-image="assets/ChronoNAD+.png">
+                                    <span class="btn-text">Add to Cart</span>
+                                    <span class="btn-feedback" aria-hidden="true">✔ Added!</span>
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    <!-- Product 2: Genomics Testing Kit -->
+                    <article class="product-card">
+                        <div class="product-media">
+                            <img src="assets/Genomics Testing Kit.jpg" alt="Genomics Testing Kit" loading="lazy">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">Genomics Testing Kit</h3>
+                            <div class="product-rating" aria-label="Rated 4.7 out of 5">
+                                <span>★★★★☆</span>
+                                <span class="count">(683 reviews)</span>
+                            </div>
+                            <p>Partner lab kit to personalize your wellness insights.</p>
+                            <div class="product-quantity">1 Kit • Results in ~2 weeks</div>
+                            <div class="product-price" data-price="199.99">$199.99</div>
+                            <div class="product-actions">
+                                <button class="btn btn-primary add-to-cart" data-id="genomics-kit" data-name="Genomics Testing Kit" data-price="199.99" data-image="assets/Genomics Testing Kit.jpg">
+                                    <span class="btn-text">Add to Cart</span>
+                                    <span class="btn-feedback" aria-hidden="true">✔ Added!</span>
+                                </button>
+                            </div>
+                        </div>
+                    </article>
                 </div>
             </div>
         </div>
@@ -2841,6 +3061,164 @@
             // Recalculate on resize
             window.addEventListener('resize', applyTransform);
         }
+
+        // --- Mini Cart + Product Carousel Logic ---
+        (function() {
+            const cartToggle = document.getElementById('cartToggle');
+            const cartClose = document.getElementById('cartClose');
+            const cartCount = document.getElementById('cartCount');
+            const cartHeaderCount = document.getElementById('cartHeaderCount');
+            const miniCartPanel = document.getElementById('miniCartPanel');
+            const miniCartItems = document.getElementById('miniCartItems');
+            const rowSubtotal = document.getElementById('rowSubtotal');
+            const rowShipping = document.getElementById('rowShipping');
+            const rowTax = document.getElementById('rowTax');
+            const rowTotal = document.getElementById('rowTotal');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+
+            const state = {
+                items: {},
+                shipping: 8.00,
+                taxRate: 0.0565
+            };
+
+            function formatCurrency(value) {
+                return `$${value.toFixed(2)}`;
+            }
+
+            function getItemKey(id) { return String(id); }
+
+            function addItem({ id, name, price, image }) {
+                const key = getItemKey(id);
+                if (!state.items[key]) {
+                    state.items[key] = { id, name, price: Number(price), image: image || '', qty: 0 };
+                }
+                state.items[key].qty += 1;
+                renderCart();
+            }
+
+            function removeItem(id) {
+                const key = getItemKey(id);
+                if (!state.items[key]) return;
+                state.items[key].qty -= 1;
+                if (state.items[key].qty <= 0) delete state.items[key];
+                renderCart();
+            }
+
+            function calcTotals() {
+                let count = 0; let subtotal = 0;
+                Object.values(state.items).forEach(it => {
+                    count += it.qty;
+                    subtotal += it.qty * it.price;
+                });
+                const shipping = count > 0 ? state.shipping : 0;
+                const tax = subtotal * state.taxRate;
+                const total = subtotal + shipping + tax;
+                return { count, subtotal, shipping, tax, total };
+            }
+
+            function renderCart() {
+                const { count, subtotal, shipping, tax, total } = calcTotals();
+                cartCount.textContent = String(count);
+                if (cartHeaderCount) cartHeaderCount.textContent = String(count);
+                if (rowSubtotal) rowSubtotal.textContent = formatCurrency(subtotal);
+                if (rowShipping) rowShipping.textContent = formatCurrency(shipping);
+                if (rowTax) rowTax.textContent = formatCurrency(tax);
+                if (rowTotal) rowTotal.textContent = formatCurrency(total);
+                miniCartItems.innerHTML = '';
+                Object.values(state.items).forEach(it => {
+                    const li = document.createElement('li');
+                    li.className = 'mini-cart-item';
+                    li.innerHTML = `
+                        <div class="mini-cart-thumb">${it.image ? `<img src="${it.image}" alt="${it.name}">` : ''}</div>
+                        <div class="info">
+                            <span class="name">${it.name}</span>
+                            <span class="meta">${it.qty} × ${formatCurrency(it.price)}</span>
+                        </div>
+                        <div class="line-total">${formatCurrency(it.qty * it.price)}</div>
+                        <button class="mini-cart-remove" aria-label="Remove one" data-remove="${it.id}">✕</button>
+                    `;
+                    miniCartItems.appendChild(li);
+                });
+
+                miniCartItems.querySelectorAll('[data-remove]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        removeItem(btn.getAttribute('data-remove'));
+                    });
+                });
+
+                // toggle empty state class on panel
+                if (count === 0) {
+                    miniCartPanel.classList.add('cart-is-empty');
+                } else {
+                    miniCartPanel.classList.remove('cart-is-empty');
+                }
+            }
+
+            function openCart() {
+                miniCartPanel.classList.add('open');
+                cartToggle.setAttribute('aria-expanded', 'true');
+            }
+            function closeCart() {
+                miniCartPanel.classList.remove('open');
+                cartToggle.setAttribute('aria-expanded', 'false');
+            }
+
+            if (cartToggle && miniCartPanel) {
+                cartToggle.addEventListener('click', () => {
+                    const isOpen = miniCartPanel.classList.contains('open');
+                    if (isOpen) closeCart(); else openCart();
+                });
+            }
+            if (cartClose) {
+                cartClose.addEventListener('click', closeCart);
+            }
+            document.addEventListener('click', (e) => {
+                const cart = document.getElementById('miniCart');
+                if (!cart) return;
+                const path = typeof e.composedPath === 'function' ? e.composedPath() : [];
+                const clickedInside = (path.includes && path.includes(cart)) || cart.contains(e.target);
+                if (!clickedInside) {
+                    closeCart();
+                }
+            });
+
+            // Bind Add to Cart buttons
+            document.querySelectorAll('.add-to-cart').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const name = btn.getAttribute('data-name');
+                    const price = parseFloat(btn.getAttribute('data-price'));
+                    const image = btn.getAttribute('data-image') || '';
+                    addItem({ id, name, price, image });
+                    // button feedback animation
+                    btn.classList.add('is-added');
+                    setTimeout(() => btn.classList.remove('is-added'), 1500);
+                    openCart();
+                });
+            });
+
+            // Product carousel simple slide (2 cards side-by-side on >=640px)
+            const productSlider = document.getElementById('productSlider');
+            const productsPrev = document.getElementById('productsPrev');
+            const productsNext = document.getElementById('productsNext');
+            if (productSlider && productsPrev && productsNext) {
+                let index = 0; // 0 -> first view, 1 -> second view when more items added
+                function slideTo(i) {
+                    index = Math.max(0, Math.min(i, productSlider.children.length - 1));
+                    const viewport = productSlider.parentElement;
+                    const slideWidth = viewport.clientWidth;
+                    productSlider.style.transform = `translateX(-${index * slideWidth}px)`;
+                }
+                productsPrev.addEventListener('click', () => slideTo(index - 1));
+                productsNext.addEventListener('click', () => slideTo(index + 1));
+                window.addEventListener('resize', () => slideTo(index));
+            }
+
+            // Initial render
+            renderCart();
+        })();
 
     </script>
 </body>

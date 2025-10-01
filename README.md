@@ -45,3 +45,6 @@ python3 -m http.server 8000
 - All CSS and JS are inline in `index.html` for simplicity.
 - Tested on modern browsers; graceful degradation on older ones is not guaranteed.
 
+
+
+
